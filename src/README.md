@@ -37,4 +37,9 @@ turtlebot description caused error
 
 while processing /home/workspace/home_service_robot/src/turtlebot_simulator/turtlebot_gazebo/launch/includes/kobuki.launch.xml:
 Invalid <param> tag: Cannot load command parameter [robot_description]: command [/opt/ros/kinetic/lib/xacro/xacro 
-pip install rospkg seem to fix the issue
+
+'''
+pip install rospkg 
+'''
+
+seem to fix the issue
