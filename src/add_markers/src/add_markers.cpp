@@ -4,8 +4,8 @@
 #include <complex>
 
 //Positions and thresholds
-float pickUp[3] = {3.0, 5.0, 1.0};
-float dropOff[3] = {-1.0, 0.0, 1.0};
+float pickUp[3] = {6.0, 3.0, 1.0};
+float dropOff[3] = {0.0, 0.0, 1.0};
 float thresh[2] = {0.3, 0.01};
 
 //Flags
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     }
 
     marker_pub.publish(marker);
-    ROS_INFO("Pick-up marker displayed");
+    ROS_INFO("Show Pick-up marker");
 
     //Wait for Pick-Up
     while (!atPickUp)
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
       ;
       marker.action = visualization_msgs::Marker::ADD;
       marker_pub.publish(marker);
-      ROS_INFO("Drop-off marker displayed");
+      ROS_INFO("Show Drop-off marker");
       dropOffDone = true;
       ros::Duration(10.0).sleep();
     }

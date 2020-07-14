@@ -8,7 +8,6 @@ project(add_markers)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  nav_msgs
   roscpp
   rospy
   visualization_msgs
@@ -71,7 +70,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   nav_msgs#   visualization_msgs
+#   visualization_msgs
 # )
 
 ################################################
@@ -134,7 +133,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/add_markers_node.cpp)
+add_executable(${PROJECT_NAME}_node src/add_markers.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -150,6 +149,7 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 #############
 ## Install ##
