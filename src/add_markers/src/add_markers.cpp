@@ -25,6 +25,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &msg)
       atPickUp = true;
     }
   }
+
   else
   {
     atPickUp = false;
@@ -68,13 +69,13 @@ int main(int argc, char **argv)
     marker.ns = "basic_shapes";
     marker.id = 0;
 
-    // Set the marker type.  
+    // Set the marker type.
     marker.type = shape;
 
-    // Set the marker action. 
+    // Set the marker action.
     marker.action = visualization_msgs::Marker::ADD;
 
-    // Set the pose of the marker. 
+    // Set the pose of the marker.
     marker.pose.position.x = pickUp[0];
     marker.pose.position.y = pickUp[1];
     marker.pose.position.z = 0;
