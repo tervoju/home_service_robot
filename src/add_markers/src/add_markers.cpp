@@ -14,7 +14,7 @@ bool atDropOff = false;
 bool pickUpDone = false;
 bool dropOffDone = false;
 
-void chatterCallback(const nav_msgs::Odometry::ConstPtr &msg)
+void odomCallback(const nav_msgs::Odometry::ConstPtr &msg)
 {
 
   //Pick up
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   ros::Rate r(1);
   ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
-  ros::Subscriber odom_sub = n.subscribe("odom", 1000, chatterCallback);
+  ros::Subscriber odom_sub = n.subscribe("odom", 1000, odomCallback);
 
   // Set our initial shape type to be a cube
   uint32_t shape = visualization_msgs::Marker::CUBE;
@@ -68,13 +68,13 @@ int main(int argc, char **argv)
     marker.ns = "basic_shapes";
     marker.id = 0;
 
-    // Set the marker type.  Initially this is CUBE, and cycles between that and SPHERE, ARROW, and CYLINDER
+    // Set the marker type.  
     marker.type = shape;
 
-    // Set the marker action.  Options are ADD, DELETE, and new in ROS Indigo: 3 (DELETEALL)
+    // Set the marker action. 
     marker.action = visualization_msgs::Marker::ADD;
 
-    // Set the pose of the marker.  This is a full 6DOF pose relative to the frame/time specified in the header
+    // Set the pose of the marker. 
     marker.pose.position.x = pickUp[0];
     marker.pose.position.y = pickUp[1];
     marker.pose.position.z = 0;
