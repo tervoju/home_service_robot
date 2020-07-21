@@ -1,18 +1,13 @@
 # Home Service Robot
 
+turtlebot robot simulation where:
+
+- initially show marker to be picked up from pickup zone
+- hide the marker once robot reach the pickup zone and wait 5 sec to simulate a pickup
+- shos the marker at the drop off zone once robot reaches it
 
 
-# Environment
-Distributor ID:	Ubuntu
 
-Description:	Ubuntu 16.04.6 LTS
-
-Release:	16.04
-
-Codename:	xenial
-
-# ROS
-[kinetic](wiki.ros.org/kinetic)
 
 
 # ROS libraries
@@ -25,14 +20,25 @@ wiki.ros.org/turtlebot_rviz_launchers
 
 wiki.ros.org/turtlebot_gazebo
 
-# House
+## House
 
-juhas.world my country house - if it works. seems to be that doors might be problematic
+originally used juhas.world as in the earlier assignments ( based on my country house) - if it works in this case. seems to be that doors might be problematic
 retried map creation with https://github.com/udacity/pgm_map_creator
-in the map there is no doors. decided to do simple house without doors.
+in the map there is no doors. decided to do simple house without doors, similar as  in examples of this assignment.
 
-# issues
+# Environment
+virtual environment 
+Distributor ID:	Ubuntu
+Description:	Ubuntu 16.04.6 LTS
+Release:	16.04
+Codename:	xenial
 
+# ROS
+[kinetic](wiki.ros.org/kinetic)
+
+## virtual env. Issues
+
+### issue 1
 turtlebot description caused error
 
 while processing /home/workspace/home_service_robot/src/turtlebot_simulator/turtlebot_gazebo/launch/includes/kobuki.launch.xml:
@@ -42,10 +48,9 @@ Invalid <param> tag: Cannot load command parameter [robot_description]: command 
 pip install rospkg 
 '''
 
-seem to fix the issue
+seem to fix the issue in the virtual environment.
 
-
-# virtual machine issues
+### issue 2
 
 lost user information git
 
