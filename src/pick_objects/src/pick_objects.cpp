@@ -4,7 +4,7 @@
 #include <actionlib/client/simple_action_client.h>
 
 //target locations
-float pickUpTarget[3] = {5.0, 5.0, 1.0};  // some
+float pickUpTarget[3] = {6.0, 3.0, 1.0};  // some
 float dropOffTarget[3] = {0.0, 0.0, 1.0}; //
 
 // Define a client for to send goal requests to the move_base server through a SimpleActionClient
