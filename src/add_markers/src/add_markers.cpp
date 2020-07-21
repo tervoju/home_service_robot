@@ -17,7 +17,7 @@ bool dropOffDone = false;
 void odomCallback(const nav_msgs::Odometry::ConstPtr &msg)
 {
 
-  //Pick up
+  //Pick up of the package
   if (std::abs(pickUp[0] - msg->pose.pose.position.x) < thresh[0] && std::abs(pickUp[1] - msg->pose.pose.position.y) < thresh[0] && std::abs(pickUp[2] - msg->pose.pose.orientation.w) < thresh[1])
   {
     if (!atPickUp)
@@ -31,7 +31,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &msg)
     atPickUp = false;
   }
 
-  //Drop off
+  //Drop off the package
   if (std::abs(dropOff[0] - msg->pose.pose.position.x) < thresh[0] && std::abs(dropOff[1] - msg->pose.pose.position.y) < thresh[0] && std::abs(dropOff[2] - msg->pose.pose.orientation.w) < thresh[1])
   {
     if (!atDropOff)

@@ -4,13 +4,25 @@ turtlebot robot simulation where:
 
 - initially show marker to be picked up from pickup zone
 - hide the marker once robot reach the pickup zone and wait 5 sec to simulate a pickup
-- shos the marker at the drop off zone once robot reaches it
+- shows the marker at the drop off zone once robot reaches it
+
+# node or modules
+
+## add_marker
+ROS node to show markers (either on pickup or dropoff) based on estimated position.
+
+## map
+
+new simple building, world and map created for this home service robot
+
+## pick_object 
+ROS node to move turtlebot based on target pickup and dropoff zones.
+
+## scripts
+all scripts to test and develop home service robot
 
 
-
-
-
-# ROS libraries
+# ROS libraries 
 
 wiki.ros.org/gmapping
 
@@ -44,9 +56,8 @@ turtlebot description caused error
 while processing /home/workspace/home_service_robot/src/turtlebot_simulator/turtlebot_gazebo/launch/includes/kobuki.launch.xml:
 Invalid <param> tag: Cannot load command parameter [robot_description]: command [/opt/ros/kinetic/lib/xacro/xacro 
 
-'''
 pip install rospkg 
-'''
+
 
 seem to fix the issue in the virtual environment.
 
