@@ -11,7 +11,8 @@ struct Position
 };
 
 //marker positions
-Position pickUp = {6.0, 3.0, 1.0};
+int idx = 0;
+Position pickUp[2] = {{6.0, 3.0, 1.0}, {6.0, 0.0, 1.0}};
 Position dropOff = {0.0, 0.0, 1.0};
 Position threshold = {0.3, 0.3, 0.01};
 
@@ -21,6 +22,17 @@ bool atDropOff = false;
 // delivery status
 bool pickUpDone = false;
 bool dropOffDone = false;
+
+// if more that one pickup
+void resetTargetsAndState()
+{
+    // areas
+    atPickUp = false;
+    atDropOff = false;
+    // delivery status
+    pickUpDone = false;
+    dropOffDone = false;
+}
 
 // visualization marker setting
 void createMarker(visualization_msgs::Marker *marker, Position area)
@@ -43,9 +55,9 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
     marker->pose.orientation.z = 0.0;
     marker->pose.orientation.w = area.w;
     // Set the scale of the marker -- 1x1x1 here means 1m on a side
-    marker->scale.x = 0.5;
-    marker->scale.y = 0.5;
-    marker->scale.z = 0.5;
+    marker->scale.x = 0.3;
+    marker->scale.y = 0.3;
+    marker->scale.z = 0.3;
     // Set the color -- be sure to set alpha to something non-zero!
     marker->color.r = 1.0f;
     marker->color.g = 0.0f;
@@ -53,7 +65,14 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
     marker->color.a = 1.0;
     marker->lifetime = ros::Duration();
 }
-
+// visualization marker change
+void changeMarkerPosition(visualization_msgs::Marker *marker, Position area)
+{
+    marker->pose.position.x = area.x;
+    marker->pose.position.y = area.y;
+    marker->pose.orientation.w = area.w;
+    marker->action = visualization_msgs::Marker::ADD;
+}
 bool checkArea(Position roboPos, Position target)
 {
     if (((std::abs(target.x - roboPos.x) < threshold.x)) && ((std::abs(target.y - roboPos.y) < threshold.y)) && ((std::abs(target.w - roboPos.w) < threshold.w)))
@@ -72,7 +91,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
     roboPos.w = odomMsg->pose.pose.orientation.w;
 
     // checking the robot position if in pickup area
-    if (checkArea(roboPos, pickUp))
+    if (checkArea(roboPos, pickUp[idx]))
     {
         if (!atPickUp)
         {
@@ -107,7 +126,7 @@ int main(int argc, char **argv)
     ros::Subscriber odom_sub = n.subscribe("odom", 1000, odomCallback);
     visualization_msgs::Marker marker;
 
-    createMarker(&marker, pickUp);
+    createMarker(&marker, pickUp[idx]);
 
     while (ros::ok())
     {
@@ -121,6 +140,7 @@ int main(int argc, char **argv)
             ROS_WARN_ONCE("Please create a subscriber to the marker");
             sleep(1);
         }
+
         marker_pub.publish(marker);
         ROS_INFO("Show Pick-up marker");
 
@@ -139,7 +159,7 @@ int main(int argc, char **argv)
             pickUpDone = true;
         }
 
-        //Loop : Wait for Drop Off to happen
+        //Loop : Wait for Drop Off area to be found
         while (!atDropOff)
         {
             ros::spinOnce();
@@ -149,15 +169,16 @@ int main(int argc, char **argv)
         if (atDropOff && !dropOffDone)
         {
             ROS_INFO("At Drop-off ");
-            marker.pose.position.x = dropOff.x;
-            marker.pose.position.y = dropOff.y;
-            marker.pose.orientation.w = dropOff.w;
-            marker.action = visualization_msgs::Marker::ADD;
+            changeMarkerPosition(&marker, dropOff);
             marker_pub.publish(marker);
             ROS_INFO("Show Drop-off marker");
             dropOffDone = true;
             ros::Duration(10.0).sleep();
         }
+        //resetTarget
+        resetTargetsAndState();
+        //marker.action = visualization_msgs::Marker::DELETE;
+        //marker_pub.publish(marker);
         return 0;
     }
 }
