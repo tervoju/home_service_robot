@@ -15,14 +15,14 @@ Position pickUp = {6.0, 3.0, 1.0};
 Position dropOff = {0.0, 0.0, 1.0};
 Position threshold = {0.3, 0.3, 0.01};
 
-// areas & flags
+// areas
 bool atPickUp = false;
 bool atDropOff = false;
+// delivery status
 bool pickUpDone = false;
 bool dropOffDone = false;
 
-// visualization marker
-
+// visualization marker setting
 void createMarker(visualization_msgs::Marker *marker, Position area)
 {
     marker->header.frame_id = "map";
@@ -56,7 +56,7 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
 
 bool checkArea(Position roboPos, Position target)
 {
-    if (((std::abs(target.x - roboPos.x) < threshold.x)) && ((std::abs(target.y - roboBos.y) < threshold.y)) && ((std::abs(target.w - w) < threshold.z)))
+    if (((std::abs(target.x - roboPos.x) < threshold.x)) && ((std::abs(target.y - roboPos.y) < threshold.y)) && ((std::abs(target.w - roboPos.w) < threshold.w)))
     {
         return true;
     }
@@ -64,26 +64,43 @@ bool checkArea(Position roboPos, Position target)
 }
 
 //callback function
-void odomCallback(const nav_msgs::Odometry::ConstPrt &odomMsg)
+void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
 {
     Position roboPos;
     roboPos.x = odomMsg->pose.pose.position.x;
     roboPos.y = odomMsg->pose.pose.position.y;
-    roboPos.z = odomMsg->pose.pose.position.w;
+    roboPos.w = odomMsg->pose.pose.orientation.w;
 
     // checking the robot position if in pickup area
-    checkArea(roboPos, pickUp) ? atPickUp = true : atPickUp = false;
-
+    if (checkArea(roboPos, pickUp))
+    {
+        if (!atPickUp)
+        {
+            atPickUp = true;
+        }
+    }
+    else
+    {
+        atPickUp = false;
+    }
     // checking the robot if in dropoff area
-    checkArea(roboPos, dropOff) ? atDropOff = true : atDropOff = false;
+    if (checkArea(roboPos, dropOff))
+    {
+        if (!atDropOff)
+        {
+            atDropOff = true;
+        }
+    }
+    else
+    {
+        atDropOff = false;
+    }
 }
 
 int main(int argc, char **argv)
 {
-    ROS_INFO("Main");
+    ROS_INFO("Main add_markers");
     ros::init(argc, argv, "add_markers");
-
-    //
     ros::NodeHandle n;
     ros::Rate r(1);
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
@@ -113,6 +130,15 @@ int main(int argc, char **argv)
             ros::spinOnce();
         }
 
+        // pickup place found and marker removed
+        if (atPickUp && !pickUpDone)
+        {
+            marker.action = visualization_msgs::Marker::DELETE;
+            marker_pub.publish(marker);
+            ROS_INFO("Pick-up marker removed");
+            pickUpDone = true;
+        }
+
         //Loop : Wait for Drop Off to happen
         while (!atDropOff)
         {
@@ -122,15 +148,16 @@ int main(int argc, char **argv)
         // pick up done and drop off to ne done
         if (atDropOff && !dropOffDone)
         {
+            ROS_INFO("At Drop-off ");
             marker.pose.position.x = dropOff.x;
             marker.pose.position.y = dropOff.y;
-            marker.pose.orientation.w = dropOff.z;
+            marker.pose.orientation.w = dropOff.w;
             marker.action = visualization_msgs::Marker::ADD;
             marker_pub.publish(marker);
             ROS_INFO("Show Drop-off marker");
             dropOffDone = true;
             ros::Duration(10.0).sleep();
         }
-        return;
+        return 0;
     }
 }
