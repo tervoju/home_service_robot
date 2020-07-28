@@ -8,7 +8,7 @@ sleep 5
 xterm -e " rosrun rviz rviz -d /home/workspace/new_home_service_robot/home_service_robot/src/rvizConfig/rvizConfig.rviz " &
 sleep 15
 
-xterm -e "rosrun add_markers add_markers" &
+xterm -e "rosrun add_markers add_markers _x:=6.0 _y:=1.0" &
 sleep 5
 
 xterm -e "rosrun pick_objects pick_objects"
