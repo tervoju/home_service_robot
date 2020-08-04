@@ -2,6 +2,7 @@
 #include <visualization_msgs/Marker.h>
 #include "nav_msgs/Odometry.h"
 #include <complex>
+#include <string>
 
 struct Position
 {
@@ -104,11 +105,11 @@ bool checkParam(float x, float y)
         return false;
     if (y < 0.0)
         return false;
-    if (x <= 7.0 && x >= 6.0) && (y >= 0.0 && y <= 5.0)
+    if ((x <= 7.0 && x >= 6.0) && (y >= 0.0 && y <= 5.0))
         return true;
-    if (x >= -3.5 && x <= -2.5) && (y >= 0.0 && y <= 3.0)
+    if ((x >= -3.5 && x <= -2.5) && (y >= 0.0 && y <= 3.0))
         return true;
-    if (x >= -3.5 && x <= 7.0) && (y >=0.0 && y y <= 1.0)
+    if ((x >= -3.5 && x <= 7.0) && (y >=0.0 && y <= 1.0))
         return true;
 
 }
@@ -127,15 +128,24 @@ int main(int argc, char **argv)
     // if parameters ok for pickup, use them otherwise use defaults
     if (n.hasParam("x") && n.hasParam("y"))
     {
-        float x, y;
-        if (n.getParam("x", x) && n.getParam("y", y))
+        ROS_INFO("x and y parameters received");
+        std::string xs, ys;
+        if (n.getParam("x", xs) && n.getParam("y", ys))
         {
-            if (checkParam(x,y)
+            ROS_INFO("x and y parameters");
+            float x = std::stof(xs);
+            float y = std::stof(ys);
+            ros::Duration(3.0).sleep();
+            if (checkParam(x,y))
             {
                 pickUp.x = x;
                 pickUp.y = y;
             }
         }
+    }
+    else 
+    {
+          ROS_INFO("no x and y parameters received");
     }
 
     createMarker(&marker, pickUp);
