@@ -101,7 +101,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
 // pickUp area should be inside the house 
 bool checkParam(float x, float y)
 {
-    if (x > 7.0 && x < -3.0) 
+    if (x > 7.0 || x < -3.0) 
         return false;
     if (y < 0.0)
         return false;
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 {
     ROS_INFO("Main add_markers");
     ros::init(argc, argv, "add_markers");
-    ros::NodeHandle n;
+    ros::NodeHandle n("~");
     ros::Rate r(1);
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     ros::Subscriber odom_sub = n.subscribe("odom", 1000, odomCallback);
@@ -129,17 +129,18 @@ int main(int argc, char **argv)
     if (n.hasParam("x") && n.hasParam("y"))
     {
         ROS_INFO("x and y parameters received");
-        std::string xs, ys;
-        if (n.getParam("x", xs) && n.getParam("y", ys))
+        double x, y;
+        if (n.getParam("x", x) && n.getParam("y", y))
         {
-            ROS_INFO("x and y parameters");
-            float x = std::stof(xs);
-            float y = std::stof(ys);
-            ros::Duration(3.0).sleep();
             if (checkParam(x,y))
             {
+                ROS_INFO("x and y parameters ok");
                 pickUp.x = x;
                 pickUp.y = y;
+            }
+            else
+            {
+                ROS_INFO("x and y parameters not ok");
             }
         }
     }
