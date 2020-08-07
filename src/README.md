@@ -32,9 +32,10 @@ wiki.ros.org/turtlebot_rviz_launchers
 
 wiki.ros.org/turtlebot_gazebo
 
+
 ## House
 
-originally used juhas.world as in the earlier assignments ( based on my country house) - if it works in this case. seems to be that doors might be problematic
+originally used world as in the earlier assignments ( based on my country house) - if it works in this case. seems to be that doors might be problematic
 retried map creation with https://github.com/udacity/pgm_map_creator
 in the map there is no doors. decided to do simple house without doors, similar as  in examples of this assignment.
 
@@ -58,16 +59,7 @@ Invalid <param> tag: Cannot load command parameter [robot_description]: command 
 
 pip install rospkg 
 
-
-seem to fix the issue in the virtual environment.
-
-### issue 2
-
-lost user information git
-
-  git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
-
+seem to fix the issue in the virtual environment. 
 
 # orientation issue
 generated map was flipped 90 degree 

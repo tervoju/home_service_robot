@@ -4,6 +4,7 @@
 #include <complex>
 #include <string>
 
+// struct to wrap the target areas
 struct Position
 {
     float x;
@@ -11,8 +12,7 @@ struct Position
     float w;
 };
 
-//marker positions
-int idx = 0;
+//default marker positions (if no arguments given)
 Position pickUp = {6.0, 3.0, 1.0};
 Position dropOff = {0.0, 0.0, 1.0};
 Position threshold = {0.3, 0.3, 0.01};
@@ -24,7 +24,7 @@ bool atDropOff = false;
 bool pickUpDone = false;
 bool dropOffDone = false;
 
-// if more that one pickup
+// not used currently.
 void resetTargetsAndState()
 {
     // areas
@@ -35,7 +35,7 @@ void resetTargetsAndState()
     dropOffDone = false;
 }
 
-// visualization marker setting
+// visualization marker setting creation
 void createMarker(visualization_msgs::Marker *marker, Position area)
 {
     marker->header.frame_id = "map";
@@ -47,7 +47,7 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
     marker->type = visualization_msgs::Marker::CUBE;
     // Set the marker action.
     marker->action = visualization_msgs::Marker::ADD;
-    // Set the pose of the marker.
+    // Set the pose of the marker
     marker->pose.position.x = area.x;
     marker->pose.position.y = area.y;
     marker->pose.position.z = 0;
@@ -55,11 +55,11 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
     marker->pose.orientation.y = 0.0;
     marker->pose.orientation.z = 0.0;
     marker->pose.orientation.w = area.w;
-    // Set the scale of the marker -- 1x1x1 here means 1m on a side
+    // The scale of the marker 
     marker->scale.x = 0.3;
     marker->scale.y = 0.3;
     marker->scale.z = 0.3;
-    // Set the color -- be sure to set alpha to something non-zero!
+    // Set the color 
     marker->color.r = 1.0f;
     marker->color.g = 0.0f;
     marker->color.b = 0.0f;
@@ -75,6 +75,8 @@ void changeMarkerPosition(visualization_msgs::Marker *marker, Position area)
     marker->pose.orientation.w = area.w;
     marker->action = visualization_msgs::Marker::ADD;
 }
+
+// check for pick-up and drop of areas
 bool checkArea(Position roboPos, Position target)
 {
     if (((std::abs(target.x - roboPos.x) < threshold.x)) && ((std::abs(target.y - roboPos.y) < threshold.y)) && ((std::abs(target.w - roboPos.w) < threshold.w)))
@@ -84,7 +86,7 @@ bool checkArea(Position roboPos, Position target)
     return false;
 }
 
-//callback function
+// callback function checking the robot position based on odom information
 void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
 {
     Position roboPos;
@@ -100,6 +102,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
 }
 
 // pickUp area should be inside the house 
+// some check for input parameters - not meant to be correct in all cases
 bool checkParam(float x, float y)
 {
     if (x > 7.0 || x < -3.0) 
