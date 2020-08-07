@@ -2,6 +2,7 @@
 #include <visualization_msgs/Marker.h>
 #include "nav_msgs/Odometry.h"
 #include <complex>
+#include <string>
 
 struct Position
 {
@@ -12,7 +13,7 @@ struct Position
 
 //marker positions
 int idx = 0;
-Position pickUp[2] = {{6.0, 3.0, 1.0}, {6.0, 0.0, 1.0}};
+Position pickUp = {6.0, 3.0, 1.0};
 Position dropOff = {0.0, 0.0, 1.0};
 Position threshold = {0.3, 0.3, 0.01};
 
@@ -64,6 +65,7 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
     marker->color.b = 0.0f;
     marker->color.a = 1.0;
     marker->lifetime = ros::Duration();
+    ROS_INFO("marker created ok %f %f", area.x, area.y);
 }
 // visualization marker change
 void changeMarkerPosition(visualization_msgs::Marker *marker, Position area)
@@ -91,29 +93,26 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
     roboPos.w = odomMsg->pose.pose.orientation.w;
 
     // checking the robot position if in pickup area
-    if (checkArea(roboPos, pickUp[idx]))
-    {
-        if (!atPickUp)
-        {
-            atPickUp = true;
-        }
-    }
-    else
-    {
-        atPickUp = false;
-    }
+    checkArea(roboPos, pickUp) && !atPickUp ? atPickUp = true : atPickUp = false;
+
     // checking the robot if in dropoff area
-    if (checkArea(roboPos, dropOff))
-    {
-        if (!atDropOff)
-        {
-            atDropOff = true;
-        }
-    }
-    else
-    {
-        atDropOff = false;
-    }
+    checkArea(roboPos, dropOff) && !atDropOff ? atDropOff = true : atDropOff = false;
+}
+
+// pickUp area should be inside the house 
+bool checkParam(float x, float y)
+{
+    if (x > 7.0 || x < -3.0) 
+        return false;
+    if (y < 0.0)
+        return false;
+    if ((x <= 7.0 && x >= 6.0) && (y >= 0.0 && y <= 5.0))
+        return true;
+    if ((x >= -3.5 && x <= -2.5) && (y >= 0.0 && y <= 3.0))
+        return true;
+    if ((x >= -3.5 && x <= 7.0) && (y >=0.0 && y <= 1.0))
+        return true;
+
 }
 
 int main(int argc, char **argv)
@@ -121,15 +120,43 @@ int main(int argc, char **argv)
     ROS_INFO("Main add_markers");
     ros::init(argc, argv, "add_markers");
     ros::NodeHandle n;
+    ros::NodeHandle nPrivate("~");
     ros::Rate r(1);
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     ros::Subscriber odom_sub = n.subscribe("odom", 1000, odomCallback);
-    visualization_msgs::Marker marker;
+    
 
-    createMarker(&marker, pickUp[idx]);
-
+    // add marker to param
+    // if parameters ok for pickup, use them otherwise use defaults
+    
+    if (nPrivate.hasParam("x") && nPrivate.hasParam("y"))
+    {
+        ROS_INFO("x and y parameters received");
+        double x, y;
+        if (nPrivate.getParam("x", x) && nPrivate.getParam("y", y))
+        {
+            if (checkParam(x,y))
+            {
+                pickUp.x = x;
+                pickUp.y = y;
+                ROS_INFO("x and y parameters ok");
+            }
+            else
+            {
+                ROS_INFO("x and y parameters not ok");
+            }
+        }
+    }
+    else 
+    {
+          ROS_INFO("no x and y parameters received");
+    }
+    ROS_INFO("x and y parameters ok %f %f", pickUp.x, pickUp.y);
+    
     while (ros::ok())
     {
+        visualization_msgs::Marker marker;
+        createMarker(&marker, pickUp);
         // Publish the marker
         while (marker_pub.getNumSubscribers() < 1)
         {
@@ -137,6 +164,7 @@ int main(int argc, char **argv)
             {
                 return 0;
             }
+            ROS_INFO(".");
             ROS_WARN_ONCE("Please create a subscriber to the marker");
             sleep(1);
         }
@@ -175,10 +203,6 @@ int main(int argc, char **argv)
             dropOffDone = true;
             ros::Duration(10.0).sleep();
         }
-        //resetTarget
-        resetTargetsAndState();
-        //marker.action = visualization_msgs::Marker::DELETE;
-        //marker_pub.publish(marker);
         return 0;
     }
 }
