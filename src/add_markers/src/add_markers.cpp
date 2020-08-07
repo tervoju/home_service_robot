@@ -65,6 +65,7 @@ void createMarker(visualization_msgs::Marker *marker, Position area)
     marker->color.b = 0.0f;
     marker->color.a = 1.0;
     marker->lifetime = ros::Duration();
+    ROS_INFO("marker created ok %f %f", area.x, area.y);
 }
 // visualization marker change
 void changeMarkerPosition(visualization_msgs::Marker *marker, Position area)
@@ -92,10 +93,10 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr &odomMsg)
     roboPos.w = odomMsg->pose.pose.orientation.w;
 
     // checking the robot position if in pickup area
-    checkArea(roboPos, pickUp) &&!atPickUp ? atPickUp = true : atPickUp = false;
+    checkArea(roboPos, pickUp) && !atPickUp ? atPickUp = true : atPickUp = false;
 
     // checking the robot if in dropoff area
-    checkArea(roboPos, dropOff) &&!atDropOff ? atDropOff = true : atDropOff = false;
+    checkArea(roboPos, dropOff) && !atDropOff ? atDropOff = true : atDropOff = false;
 }
 
 // pickUp area should be inside the house 
@@ -118,25 +119,27 @@ int main(int argc, char **argv)
 {
     ROS_INFO("Main add_markers");
     ros::init(argc, argv, "add_markers");
-    ros::NodeHandle n("~");
+    ros::NodeHandle n;
+    ros::NodeHandle nPrivate("~");
     ros::Rate r(1);
     ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
     ros::Subscriber odom_sub = n.subscribe("odom", 1000, odomCallback);
-    visualization_msgs::Marker marker;
+    
 
     // add marker to param
     // if parameters ok for pickup, use them otherwise use defaults
-    if (n.hasParam("x") && n.hasParam("y"))
+    
+    if (nPrivate.hasParam("x") && nPrivate.hasParam("y"))
     {
         ROS_INFO("x and y parameters received");
         double x, y;
-        if (n.getParam("x", x) && n.getParam("y", y))
+        if (nPrivate.getParam("x", x) && nPrivate.getParam("y", y))
         {
             if (checkParam(x,y))
             {
-                ROS_INFO("x and y parameters ok");
                 pickUp.x = x;
                 pickUp.y = y;
+                ROS_INFO("x and y parameters ok");
             }
             else
             {
@@ -148,11 +151,12 @@ int main(int argc, char **argv)
     {
           ROS_INFO("no x and y parameters received");
     }
-
-    createMarker(&marker, pickUp);
-
+    ROS_INFO("x and y parameters ok %f %f", pickUp.x, pickUp.y);
+    
     while (ros::ok())
     {
+        visualization_msgs::Marker marker;
+        createMarker(&marker, pickUp);
         // Publish the marker
         while (marker_pub.getNumSubscribers() < 1)
         {
@@ -160,6 +164,7 @@ int main(int argc, char **argv)
             {
                 return 0;
             }
+            ROS_INFO(".");
             ROS_WARN_ONCE("Please create a subscriber to the marker");
             sleep(1);
         }

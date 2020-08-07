@@ -3,15 +3,14 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 
-
 struct Position
 {
-    float x;
-    float y;
-    float w;
+  float x;
+  float y;
+  float w;
 };
 
-//Targets 
+//Targets
 Position pickUpTarget = {6.0, 3.0, 1.0};
 Position dropOffTarget = {0.0, 0.0, 1.0};
 
@@ -30,6 +29,27 @@ int main(int argc, char **argv)
 {
   // Initialize the simple_navigation_goals node
   ros::init(argc, argv, "pick_objects");
+  ros::NodeHandle nPrivate("~");
+
+  // if parameters ok for pickup, use them otherwise use defaults
+
+  if (nPrivate.hasParam("x") && nPrivate.hasParam("y"))
+  {
+    ROS_INFO("x and y parameters received");
+    double x, y;
+    // checked in add marker - should be same arguments
+    if (nPrivate.getParam("x", x) && nPrivate.getParam("y", y))
+    {
+        pickUpTarget.x = x;
+        pickUpTarget.y = y;
+        ROS_INFO("x and y parameters ok");
+    }
+  }
+  else
+  {
+    ROS_INFO("no x and y parameters received");
+  }
+  ROS_INFO("x and y parameters ok %f %f", pickUpTarget.x, pickUpTarget.y);
 
   MoveBaseClient ac("move_base", true);
 
@@ -65,7 +85,7 @@ int main(int argc, char **argv)
       ROS_INFO("the drop off target reached");
       ros::Duration(5.0).sleep();
     }
-    else 
+    else
     {
       ROS_INFO("the home robot failed for move to drop off location for some reason");
     }

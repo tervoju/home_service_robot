@@ -11,4 +11,4 @@ sleep 15
 xterm -e "rosrun add_markers add_markers _x:=4.0 _y:=1.0" &
 sleep 5
 
-xterm -e "rosrun pick_objects pick_objects"
+xterm -e "rosrun pick_objects pick_objects _x:=4.0 _y:=1.0"
